@@ -396,3 +396,41 @@ footer {
     border-color: #00ffea;
     color: #00ffea;
 }
+
+/* Glitch form: hidden spam trap and in-page confirmation */
+.hp {
+    display: none;
+}
+
+.form-done {
+    max-width: 520px;
+    margin: 30px auto 0;
+    padding: 30px 20px;
+    border: 1px solid #00ffea;
+    box-shadow: 0 0 10px #00ffea;
+    background: #111;
+    outline: none;
+}
+
+.form-done[hidden] {
+    display: none;
+}
+
+.form-done .glitch {
+    display: inline-block;
+    margin: 0 0 12px;
+    font-size: 2em;
+}
+
+.form-done p {
+    color: #ccc;
+}
+
+.glitch-form .btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.glitch-form[hidden] {
+    display: none;
+}
