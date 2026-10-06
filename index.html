@@ -16,7 +16,7 @@
     <div class="hero">
         <h1 class="glitch" data-text="ARE YOU THE GLITCH?">ARE YOU THE GLITCH?</h1>
         <p class="tagline">A podcast exploring tech, reality, and the breakdowns in between.</p>
-        <a href="#about" class="btn">Enter the System</a>
+        <a href="#about" class="btn" id="enter">Enter the System</a>
     </div>
 
     <section id="about">
@@ -97,6 +97,38 @@
     <footer>
         <p>&copy; 2026 AreYouAGlitch.com</p>
     </footer>
+    <div id="system" class="system" role="dialog" aria-modal="true" aria-label="Glitch diagnostic" hidden>
+        <div class="system-panel">
+            <button class="system-close" id="system-close" type="button" aria-label="Exit the system">&times;</button>
+
+            <div class="boot" id="boot" aria-live="polite"></div>
+            <button class="system-skip" id="skip" type="button">Skip &rsaquo;</button>
+
+            <div class="quiz" id="quiz" hidden>
+                <p class="quiz-progress" id="quiz-progress"></p>
+                <h2 class="quiz-question" id="quiz-question"></h2>
+                <div class="quiz-answers">
+                    <button class="btn" type="button" data-points="2">Yes</button>
+                    <button class="btn" type="button" data-points="1">Sometimes</button>
+                    <button class="btn" type="button" data-points="0">No</button>
+                </div>
+            </div>
+
+            <div class="result" id="result" hidden>
+                <p class="result-label">GLITCH LEVEL</p>
+                <p class="result-level glitch" id="result-level" data-text=""></p>
+                <h2 class="result-title" id="result-title"></h2>
+                <p class="result-text" id="result-text"></p>
+                <div class="result-actions">
+                    <button class="btn" type="button" id="share-result">Share My Result</button>
+                    <a class="btn" href="#share" id="to-form">Submit Your Glitch</a>
+                </div>
+                <button class="system-exit" id="exit" type="button">Exit the system</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="diagnostic.js"></script>
     <script>
         document.querySelectorAll('.card[data-topic]').forEach(function (card) {
             card.addEventListener('click', function () {
