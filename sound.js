@@ -110,58 +110,150 @@ window.GlitchSound = (function () {
         o.stop(t + dur + 0.05);
     }
 
-    // Static glitch that decelerates: gate gaps grow, pitch and filter sink,
-    // then it dissolves into a pure tone that rings out through the reverb.
+    // Rubber-band twang: resonant pluck that bends and wobbles as it decays
+    function twang(at, base, dur) {
+        var o = ctx.createOscillator();
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(base * 0.55, at);
+        o.frequency.exponentialRampToValueAtTime(base * 1.2, at + 0.05);
+        o.frequency.exponentialRampToValueAtTime(base, at + 0.16);
+
+        var lfo = ctx.createOscillator();
+        lfo.frequency.setValueAtTime(11 + Math.random() * 7, at);
+        lfo.frequency.exponentialRampToValueAtTime(4, at + dur);
+        var depth = ctx.createGain();
+        depth.gain.setValueAtTime(base * 0.22, at);
+        depth.gain.exponentialRampToValueAtTime(1, at + dur);
+        lfo.connect(depth);
+        depth.connect(o.frequency);
+
+        var lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.Q.value = 7;
+        lp.frequency.setValueAtTime(3200, at);
+        lp.frequency.exponentialRampToValueAtTime(500, at + dur);
+
+        var g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, at);
+        g.gain.exponentialRampToValueAtTime(0.08, at + 0.006);
+        g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+
+        o.connect(lp);
+        lp.connect(g);
+        route(g, 0.7);
+        o.start(at); lfo.start(at);
+        o.stop(at + dur + 0.05); lfo.stop(at + dur + 0.05);
+    }
+
+    // Warp dive: a pitch that drops away like a tape slowing down
+    function dive(at, from, to, dur) {
+        var o = ctx.createOscillator();
+        o.type = 'sawtooth';
+        o.frequency.setValueAtTime(from, at);
+        o.frequency.exponentialRampToValueAtTime(to, at + dur);
+        var lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.setValueAtTime(2400, at);
+        lp.frequency.exponentialRampToValueAtTime(300, at + dur);
+        var g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, at);
+        g.gain.exponentialRampToValueAtTime(0.045, at + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+        o.connect(lp);
+        lp.connect(g);
+        route(g, 0.8);
+        o.start(at);
+        o.stop(at + dur + 0.05);
+    }
+
+    // Long static glitch that decelerates, with twangs and warps tangled in it,
+    // then a final stretch that bends up into a sharp, clean tone.
     function stretchOut(startIn) {
         if (!ctx) return;
         var t0 = ctx.currentTime + startIn;
-        var len = 1.9;
+        var len = 3.6;
+        var toneFreq = 880;
 
         var src = ctx.createBufferSource();
-        src.buffer = noiseBuffer(len + 0.2);
+        src.buffer = noiseBuffer(len + 0.3);
         src.playbackRate.setValueAtTime(1, t0);
-        src.playbackRate.exponentialRampToValueAtTime(0.25, t0 + len);
+        src.playbackRate.exponentialRampToValueAtTime(0.2, t0 + len);
 
         var bp = ctx.createBiquadFilter();
         bp.type = 'bandpass';
         bp.Q.value = 1.4;
-        bp.frequency.setValueAtTime(3400, t0);
-        bp.frequency.exponentialRampToValueAtTime(420, t0 + len);
+        bp.frequency.setValueAtTime(3600, t0);
+        bp.frequency.exponentialRampToValueAtTime(380, t0 + len);
 
-        // Gate: short, fast stutters that get longer and slower
+        // Gate: fast stutters that get longer and slower
         var g = ctx.createGain();
         g.gain.setValueAtTime(0.0001, t0);
-        var at = t0, seg = 0.018, on = true;
+        var at = t0, seg = 0.016, on = true;
         while (at < t0 + len - 0.05) {
             var fade = 1 - (at - t0) / len;
-            var level = on ? (0.05 + Math.random() * 0.05) * (0.4 + 0.6 * fade) : 0.0001;
+            var level = on ? (0.05 + Math.random() * 0.05) * (0.35 + 0.65 * fade) : 0.0001;
             g.gain.setValueAtTime(level, at);
             at += seg;
-            seg *= 1.16;
+            seg *= 1.13;
             on = Math.random() < 0.7 ? !on : on;
         }
         g.gain.setValueAtTime(0.0001, at);
-
         src.connect(bp);
         bp.connect(g);
         route(g, 0.8);
         src.start(t0);
-        src.stop(t0 + len + 0.2);
+        src.stop(t0 + len + 0.3);
 
-        // The tone it resolves into
-        var toneStart = t0 + len - 0.35;
-        var o = ctx.createOscillator();
-        o.type = 'sine';
-        o.frequency.value = 880;
+        // Twangs and warp dives mixed into the static
+        twang(t0 + 0.15, 330, 0.5);
+        dive(t0 + 0.55, 1600, 90, 0.55);
+        twang(t0 + 0.95, 247, 0.6);
+        twang(t0 + 1.35, 392, 0.45);
+        dive(t0 + 1.7, 1200, 60, 0.7);
+        twang(t0 + 2.2, 196, 0.7);
+        dive(t0 + 2.55, 900, 55, 0.6);
+
+        // Final stretch: a wobbling band pulled up into the tone's pitch
+        var riseAt = t0 + len - 0.75;
+        var r = ctx.createOscillator();
+        r.type = 'triangle';
+        r.frequency.setValueAtTime(toneFreq / 4, riseAt);
+        r.frequency.exponentialRampToValueAtTime(toneFreq, riseAt + 0.7);
+        var rl = ctx.createOscillator();
+        rl.frequency.value = 14;
+        var rd = ctx.createGain();
+        rd.gain.setValueAtTime(40, riseAt);
+        rd.gain.exponentialRampToValueAtTime(1, riseAt + 0.7);
+        rl.connect(rd);
+        rd.connect(r.frequency);
+        var rg = ctx.createGain();
+        rg.gain.setValueAtTime(0.0001, riseAt);
+        rg.gain.exponentialRampToValueAtTime(0.05, riseAt + 0.5);
+        rg.gain.exponentialRampToValueAtTime(0.0001, riseAt + 0.78);
+        r.connect(rg);
+        route(rg, 0.75);
+        r.start(riseAt); rl.start(riseAt);
+        r.stop(riseAt + 0.85); rl.stop(riseAt + 0.85);
+
+        // The tone: hard attack, bright harmonics, rings out
+        var toneStart = t0 + len - 0.05;
         var tg = ctx.createGain();
         tg.gain.setValueAtTime(0.0001, toneStart);
-        tg.gain.exponentialRampToValueAtTime(0.09, toneStart + 0.3);
-        tg.gain.setValueAtTime(0.09, toneStart + 0.9);
-        tg.gain.exponentialRampToValueAtTime(0.0001, toneStart + 2.8);
-        o.connect(tg);
+        tg.gain.exponentialRampToValueAtTime(0.1, toneStart + 0.008);
+        tg.gain.setValueAtTime(0.1, toneStart + 1.0);
+        tg.gain.exponentialRampToValueAtTime(0.0001, toneStart + 3.0);
+        [[toneFreq, 'sine', 0.7], [toneFreq, 'square', 0.12], [toneFreq * 2, 'sine', 0.22], [toneFreq * 3, 'sine', 0.08]].forEach(function (p) {
+            var o = ctx.createOscillator();
+            o.type = p[1];
+            o.frequency.value = p[0];
+            var pg = ctx.createGain();
+            pg.gain.value = p[2];
+            o.connect(pg);
+            pg.connect(tg);
+            o.start(toneStart);
+            o.stop(toneStart + 3.1);
+        });
         route(tg, 0.85);
-        o.start(toneStart);
-        o.stop(toneStart + 2.9);
     }
 
     return {
