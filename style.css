@@ -434,3 +434,15 @@ footer {
 .glitch-form[hidden] {
     display: none;
 }
+
+.form-status {
+    align-self: center;
+    margin: 14px 0 0;
+    color: #00ffea;
+    font-size: 0.95em;
+}
+
+.form-status::before {
+    content: '> ';
+    color: #ff00ff;
+}
