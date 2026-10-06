@@ -110,6 +110,60 @@ window.GlitchSound = (function () {
         o.stop(t + dur + 0.05);
     }
 
+    // Static glitch that decelerates: gate gaps grow, pitch and filter sink,
+    // then it dissolves into a pure tone that rings out through the reverb.
+    function stretchOut(startIn) {
+        if (!ctx) return;
+        var t0 = ctx.currentTime + startIn;
+        var len = 1.9;
+
+        var src = ctx.createBufferSource();
+        src.buffer = noiseBuffer(len + 0.2);
+        src.playbackRate.setValueAtTime(1, t0);
+        src.playbackRate.exponentialRampToValueAtTime(0.25, t0 + len);
+
+        var bp = ctx.createBiquadFilter();
+        bp.type = 'bandpass';
+        bp.Q.value = 1.4;
+        bp.frequency.setValueAtTime(3400, t0);
+        bp.frequency.exponentialRampToValueAtTime(420, t0 + len);
+
+        // Gate: short, fast stutters that get longer and slower
+        var g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t0);
+        var at = t0, seg = 0.018, on = true;
+        while (at < t0 + len - 0.05) {
+            var fade = 1 - (at - t0) / len;
+            var level = on ? (0.05 + Math.random() * 0.05) * (0.4 + 0.6 * fade) : 0.0001;
+            g.gain.setValueAtTime(level, at);
+            at += seg;
+            seg *= 1.16;
+            on = Math.random() < 0.7 ? !on : on;
+        }
+        g.gain.setValueAtTime(0.0001, at);
+
+        src.connect(bp);
+        bp.connect(g);
+        route(g, 0.8);
+        src.start(t0);
+        src.stop(t0 + len + 0.2);
+
+        // The tone it resolves into
+        var toneStart = t0 + len - 0.35;
+        var o = ctx.createOscillator();
+        o.type = 'sine';
+        o.frequency.value = 880;
+        var tg = ctx.createGain();
+        tg.gain.setValueAtTime(0.0001, toneStart);
+        tg.gain.exponentialRampToValueAtTime(0.09, toneStart + 0.3);
+        tg.gain.setValueAtTime(0.09, toneStart + 0.9);
+        tg.gain.exponentialRampToValueAtTime(0.0001, toneStart + 2.8);
+        o.connect(tg);
+        route(tg, 0.85);
+        o.start(toneStart);
+        o.stop(toneStart + 2.9);
+    }
+
     return {
         start: function () { init(); },
         stop: function () {},
@@ -154,12 +208,14 @@ window.GlitchSound = (function () {
             tone(987.8, 0.16, { vol: 0.07, wet: 0.85, delay: 0.07 });
         },
 
-        // Rising arpeggio plus a low swell for the result
+        // Rising arpeggio plus a low swell for the result,
+        // then static that slows and stretches out, resolving into a clean tone
         reveal: function () {
             [440, 554.4, 659.3, 880, 1318.5].forEach(function (f, i) {
                 tone(f, 0.22, { vol: 0.08, wet: 0.9, delay: i * 0.09 });
             });
             tone(55, 1.6, { vol: 0.22, wet: 0.4, attack: 0.08, glide: 49 });
+            stretchOut(0.6);
         },
 
         isMuted: function () { return muted; },
