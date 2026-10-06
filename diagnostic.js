@@ -52,7 +52,7 @@
         { max: 2, title: 'STABLE SYSTEM', text: "Barely a flicker. Either you're perfectly in sync with reality, or the glitch is hiding really well." },
         { max: 5, title: 'MINOR INTERFERENCE', text: "Small cracks are showing. Reality skips on you now and then, and you've noticed. Most people don't." },
         { max: 8, title: 'ACTIVE ANOMALY', text: "The system is struggling to keep up with you. Strange moments follow you around, and that's no coincidence." },
-        { max: 10, title: 'CRITICAL GLITCH', text: 'Reality can\'t hold you. Things break, repeat and rewrite themselves around you. You might be the glitch.' }
+        { max: 10, title: 'CRITICAL GLITCH', text: 'Reality can\'t hold you. Things break, repeat and rewrite themselves around you. You might be a glitch.' }
     ];
 
     var timers = [];
@@ -154,7 +154,7 @@
         level.setAttribute('data-text', pct + '%');
         title.textContent = tier.title;
         text.textContent = tier.text;
-        lastResult = 'My glitch level is ' + pct + '% (' + tier.title + '). Are you the glitch?';
+        lastResult = 'My glitch level is ' + pct + '% (' + tier.title + '). Are you a glitch?';
         shareBtn.textContent = 'Share My Result';
         quiz.hidden = true;
         result.hidden = false;
@@ -165,7 +165,7 @@
     function share() {
         var url = 'https://areyouaglitch.com';
         if (navigator.share) {
-            navigator.share({ title: 'Are You the Glitch?', text: lastResult, url: url }).catch(function () {});
+            navigator.share({ title: 'Are You a Glitch?', text: lastResult, url: url }).catch(function () {});
         } else if (navigator.clipboard) {
             navigator.clipboard.writeText(lastResult + ' ' + url).then(function () {
                 shareBtn.textContent = 'Copied! Paste it anywhere';
