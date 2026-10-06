@@ -95,7 +95,7 @@ window.GlitchSound = (function () {
     function tone(freq, dur, opts) {
         if (!ctx) return;
         opts = opts || {};
-        var t = ctx.currentTime + (opts.delay || 0);
+        var t = opts.when || (ctx.currentTime + (opts.delay || 0));
         var o = ctx.createOscillator();
         o.type = opts.type || 'sine';
         o.frequency.setValueAtTime(freq, t);
@@ -105,9 +105,67 @@ window.GlitchSound = (function () {
         g.gain.exponentialRampToValueAtTime(opts.vol || 0.1, t + (opts.attack || 0.004));
         g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
         o.connect(g);
-        route(g, opts.wet === undefined ? 0.8 : opts.wet);
+        if (opts.bus) g.connect(opts.bus);
+        else route(g, opts.wet === undefined ? 0.8 : opts.wet);
         o.start(t);
         o.stop(t + dur + 0.05);
+    }
+
+    // Page ambience: about 90 seconds of a soft, breathing high pad with
+    // sparse bell blips, all through the reverb and echo. No low hum.
+    var ambientPlayed = false, ambientDuck = null, ducked = false;
+
+    function ambientStart() {
+        if (ambientPlayed || muted || !init()) return;
+        ambientPlayed = true;
+        var t = ctx.currentTime, total = 90;
+
+        var bus = ctx.createGain();
+        bus.gain.setValueAtTime(0.0001, t);
+        bus.gain.exponentialRampToValueAtTime(1, t + 6);
+        bus.gain.setValueAtTime(1, t + total - 10);
+        bus.gain.exponentialRampToValueAtTime(0.0001, t + total);
+
+        ambientDuck = ctx.createGain();
+        ambientDuck.gain.value = ducked ? 0.2 : 1;
+        bus.connect(ambientDuck);
+        route(ambientDuck, 0.9);
+
+        // Pad: A, E and C# above middle register, each a slowly breathing detuned pair
+        var lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.value = 3000;
+        lp.connect(bus);
+        [[440, 0.016], [659.3, 0.013], [1108.7, 0.008]].forEach(function (v, i) {
+            [-4, 4].forEach(function (cents) {
+                var o = ctx.createOscillator();
+                o.type = 'sine';
+                o.frequency.value = v[0];
+                o.detune.value = cents;
+                var g = ctx.createGain();
+                g.gain.value = v[1];
+                var lfo = ctx.createOscillator();
+                lfo.frequency.value = 0.05 + 0.03 * i + Math.random() * 0.03;
+                var lfoDepth = ctx.createGain();
+                lfoDepth.gain.value = v[1] * 0.85;
+                lfo.connect(lfoDepth);
+                lfoDepth.connect(g.gain);
+                o.connect(g);
+                g.connect(lp);
+                o.start(t); lfo.start(t);
+                o.stop(t + total + 0.1); lfo.stop(t + total + 0.1);
+            });
+        });
+
+        // Bells: scattered soft blips across the upper octaves
+        var notes = [659.3, 880, 987.8, 1108.7, 1318.5, 1760, 2217.5];
+        var at = t + 2.5;
+        while (at < t + total - 6) {
+            tone(notes[Math.floor(Math.random() * notes.length)], 1.3 + Math.random() * 1.2, {
+                when: at, vol: 0.02 + Math.random() * 0.025, attack: 0.01, bus: bus
+            });
+            at += 1.3 + Math.random() * 2.2;
+        }
     }
 
     // Rubber-band twang: resonant pluck that bends and wobbles as it decays
@@ -310,11 +368,38 @@ window.GlitchSound = (function () {
             stretchOut(0.6);
         },
 
+        // Ambient bed for the page; starts on the visitor's first click or key press
+        ambientStart: function () { ambientStart(); },
+
+        // Lower the ambience while the diagnostic overlay is open
+        duck: function (on) {
+            ducked = !!on;
+            if (!ctx || !ambientDuck) return;
+            ambientDuck.gain.setTargetAtTime(ducked ? 0.2 : 1, ctx.currentTime, 0.3);
+        },
+        duckOn: function () { this.duck(true); },
+        duckOff: function () { this.duck(false); },
+
+        // Topic cards: each card has its own high note. Hover = tink, click = blip.
+        cardTone: function (i, click) {
+            if (!ctx || ctx.state !== 'running') return;
+            var notes = [1108.7, 1318.5, 1760, 2217.5, 2637, 3520];
+            var f = notes[i % notes.length];
+            if (click) {
+                tone(f, 0.12, { vol: 0.07, wet: 0.85 });
+                tone(f * 2, 0.16, { vol: 0.045, wet: 0.9, delay: 0.06 });
+            } else {
+                tone(f, 0.09, { type: 'triangle', vol: 0.05, wet: 0.9 });
+                tone(f * 2, 0.05, { vol: 0.015, wet: 0.9 });
+            }
+        },
+
         isMuted: function () { return muted; },
 
         setMuted: function (m) {
             muted = m;
             try { localStorage.setItem('glitchMuted', m ? '1' : '0'); } catch (e) {}
+            try { window.dispatchEvent(new Event('glitchmute')); } catch (e) {}
             if (!ctx) return;
             var t = ctx.currentTime;
             master.gain.cancelScheduledValues(t);

@@ -74,6 +74,7 @@
         document.body.style.overflow = 'hidden';
         updateMute();
         sfx('start');
+        sfx('duckOn');
         closeBtn.focus();
         runBoot();
     }
@@ -81,6 +82,7 @@
     function close(targetId) {
         clearTimers();
         sfx('stop');
+        sfx('duckOff');
         system.hidden = true;
         document.body.style.overflow = '';
         var target = targetId && document.getElementById(targetId);
@@ -184,6 +186,7 @@
         var name = document.getElementById('name');
         if (name) setTimeout(function () { name.focus({ preventScroll: true }); }, reduced ? 0 : 600);
     });
+    window.addEventListener('glitchmute', updateMute);
     if (muteBtn && sound) {
         muteBtn.addEventListener('click', function () {
             sound.setMuted(!sound.isMuted());

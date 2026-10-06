@@ -375,3 +375,24 @@ footer {
     font-size: 0.9em;
     color: #444;
 } 
+
+/* Corner sound toggle for the page */
+.page-sound {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 900;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid #444;
+    color: #888;
+    font-family: inherit;
+    font-size: 0.75em;
+    letter-spacing: 1px;
+    cursor: pointer;
+}
+
+.page-sound:hover {
+    border-color: #00ffea;
+    color: #00ffea;
+}
