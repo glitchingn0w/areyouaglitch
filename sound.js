@@ -383,7 +383,7 @@ window.GlitchSound = (function () {
         // Topic cards: each card has its own high note. Hover = tink, click = blip.
         cardTone: function (i, click) {
             if (!ctx || ctx.state !== 'running') return;
-            var notes = [1108.7, 1318.5, 1760, 2217.5, 2637, 3520];
+            var notes = [1108.7, 1318.5, 1760, 2217.5, 2637, 3520, 4434.9];
             var f = notes[i % notes.length];
             if (click) {
                 tone(f, 0.12, { vol: 0.07, wet: 0.85 });

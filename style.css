@@ -514,3 +514,31 @@ footer {
     clip: rect(0 0 0 0);
     white-space: nowrap;
 }
+
+/* Featured case file card (spans the full row) */
+.card--featured {
+    grid-column: 1 / -1;
+    border-color: #ff00ff;
+    box-shadow: 0 0 12px #ff00ff;
+}
+
+.card--featured:hover {
+    border-color: #00ffea;
+    box-shadow: 0 0 18px #00ffea;
+}
+
+.card--featured h3 {
+    font-size: 1.4em;
+}
+
+.card--featured p {
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.card-label {
+    margin-bottom: 8px;
+    color: #ff00ff;
+    font-size: 0.8em;
+    letter-spacing: 3px;
+}
