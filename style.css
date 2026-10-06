@@ -103,10 +103,14 @@ section {
 }
 
 .card {
+    display: flex;
+    flex-direction: column;
     background: #111;
     border: 1px solid #00ffea;
     padding: 20px;
     box-shadow: 0 0 10px #00ffea;
+    text-decoration: none;
+    color: inherit;
     transition: box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
 }
 
@@ -126,6 +130,17 @@ section {
     font-size: 0.95em;
     line-height: 1.5;
     color: #ccc;
+}
+
+.card-cta {
+    margin-top: auto;
+    padding-top: 16px;
+    font-size: 0.9em;
+    color: #00ffea;
+}
+
+.card:hover .card-cta {
+    color: #ff00ff;
 }
 
 footer {
