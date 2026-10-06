@@ -1,7 +1,7 @@
 // Glitch sound engine: generated with the Web Audio API, no audio files.
-// Light atmospheric drone + ticks, bleeps and static, all sent through reverb and echo.
+// Ticks, bleeps and static, all sent through reverb and echo. No background hum.
 window.GlitchSound = (function () {
-    var ctx, master, dry, send, droneNodes = null;
+    var ctx, master, dry, send;
     var VOLUME = 1.0;
     var muted = false;
     try { muted = localStorage.getItem('glitchMuted') === '1'; } catch (e) {}
@@ -110,73 +110,9 @@ window.GlitchSound = (function () {
         o.stop(t + dur + 0.05);
     }
 
-    function startDrone() {
-        if (!ctx || droneNodes) return;
-        var t = ctx.currentTime;
-        var bus = ctx.createGain();
-        bus.gain.setValueAtTime(0.0001, t);
-        bus.gain.exponentialRampToValueAtTime(0.11, t + 2.5);
-
-        var filter = ctx.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.value = 520;
-        filter.Q.value = 2;
-        filter.connect(bus);
-        route(bus, 0.5);
-
-        // Slow sweep on the filter
-        var lfo = ctx.createOscillator();
-        lfo.frequency.value = 0.06;
-        var lfoDepth = ctx.createGain();
-        lfoDepth.gain.value = 260;
-        lfo.connect(lfoDepth);
-        lfoDepth.connect(filter.frequency);
-
-        var oscs = [[55, 'sine', 0.5], [82.6, 'triangle', 0.22], [110.4, 'sine', 0.18], [164.9, 'sine', 0.06]].map(function (v) {
-            var o = ctx.createOscillator();
-            o.type = v[1];
-            o.frequency.value = v[0];
-            var g = ctx.createGain();
-            g.gain.value = v[2];
-            o.connect(g);
-            g.connect(filter);
-            o.start(t);
-            return o;
-        });
-
-        // Faint airy noise on top
-        var air = ctx.createBufferSource();
-        air.buffer = noiseBuffer(4);
-        air.loop = true;
-        var airFilter = ctx.createBiquadFilter();
-        airFilter.type = 'bandpass';
-        airFilter.frequency.value = 1100;
-        airFilter.Q.value = 0.8;
-        var airGain = ctx.createGain();
-        airGain.gain.value = 0.05;
-        air.connect(airFilter);
-        airFilter.connect(airGain);
-        airGain.connect(bus);
-        air.start(t);
-        lfo.start(t);
-
-        droneNodes = { bus: bus, sources: oscs.concat([air, lfo]) };
-    }
-
-    function stopDrone() {
-        if (!ctx || !droneNodes) return;
-        var t = ctx.currentTime;
-        var nodes = droneNodes;
-        droneNodes = null;
-        nodes.bus.gain.cancelScheduledValues(t);
-        nodes.bus.gain.setValueAtTime(Math.max(nodes.bus.gain.value, 0.0001), t);
-        nodes.bus.gain.exponentialRampToValueAtTime(0.0001, t + 1.2);
-        nodes.sources.forEach(function (s) { s.stop(t + 1.3); });
-    }
-
     return {
-        start: function () { if (init()) startDrone(); },
-        stop: function () { stopDrone(); },
+        start: function () { init(); },
+        stop: function () {},
 
         // Soft high tick for typed characters
         tick: function () {
