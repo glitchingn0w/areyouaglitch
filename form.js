@@ -87,3 +87,43 @@
         });
     }
 })();
+
+// Launch signup: same background send, with an inline confirmation
+(function () {
+    var form = document.getElementById('notify');
+    var done = document.getElementById('notify-done');
+    var button = document.getElementById('notify-submit');
+    if (!form || !done || !window.fetch) return;
+
+    var endpoint = 'https://formsubmit.co/ajax/areyouaglitchpodcast@gmail.com';
+    var label = button ? button.textContent : '';
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var data = {};
+        new FormData(form).forEach(function (value, key) { data[key] = value; });
+        if (button) { button.disabled = true; button.textContent = 'Linking...'; }
+        if (window.GlitchSound) window.GlitchSound.tick();
+
+        fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(data)
+        })
+            .then(function (res) { return res.json(); })
+            .then(function (json) {
+                if (json && (json.success === true || json.success === 'true')) {
+                    form.hidden = true;
+                    done.hidden = false;
+                    done.focus();
+                    if (window.GlitchSound) window.GlitchSound.answer();
+                } else {
+                    form.submit();
+                }
+            })
+            .catch(function () { form.submit(); })
+            .then(function () {
+                if (button) { button.disabled = false; button.textContent = label; }
+            });
+    });
+})();

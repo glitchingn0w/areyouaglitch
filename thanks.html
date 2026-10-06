@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Glitch Received | Are You the Glitch?</title>
     <link rel="icon" type="image/svg+xml" href="/favicon-animated.svg">
-    <link rel="stylesheet" href="style.css?v=20261006b" />
+    <link rel="stylesheet" href="style.css?v=20261006c" />
 </head>
 <body>
     <div class="hero">
@@ -13,6 +13,15 @@
         <p class="tagline">Thanks for sharing. Your story is in the system now.</p>
         <a href="/" class="btn">Back to the Site</a>
     </div>
+    <script>
+        if (location.search.indexOf('list=1') !== -1) {
+            var h = document.querySelector('.glitch');
+            h.textContent = 'YOU\'RE ON THE LIST';
+            h.setAttribute('data-text', 'YOU\'RE ON THE LIST');
+            document.querySelector('.tagline').textContent = "When the system goes live, you'll be the first to know.";
+            document.title = "You're on the list | Are You the Glitch?";
+        }
+    </script>
 
     <footer>
         <p>&copy; 2026 AreYouAGlitch.com</p>

@@ -10,7 +10,7 @@
     <title>Are You the Glitch?</title>
     <link rel="icon" type="image/svg+xml" href="/favicon-animated.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-animated.svg">
-    <link rel="stylesheet" href="style.css?v=20261006b" />
+    <link rel="stylesheet" href="style.css?v=20261006c" />
 </head>
 <body>
     <div class="hero">
@@ -64,7 +64,22 @@
 
     <section id="connect">
         <h2>Stay Connected</h2>
-        <p>Podcast launching soon. Follow us or share your glitch:</p>
+        <p>Podcast launching soon. Be the first to know when episode one drops.</p>
+
+        <form id="notify" class="notify-form" action="https://formsubmit.co/areyouaglitchpodcast@gmail.com" method="POST">
+            <input type="hidden" name="_subject" value="New launch signup from AreYouAGlitch.com">
+            <input type="hidden" name="_template" value="table">
+            <input type="hidden" name="_next" value="https://areyouaglitch.com/thanks.html?list=1">
+            <input type="hidden" name="signup" value="Notify me at launch">
+            <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <label for="notify-email" class="visually-hidden">Email</label>
+            <input type="email" id="notify-email" name="email" placeholder="your@email.com" required>
+            <button type="submit" class="btn" id="notify-submit">Notify Me</button>
+        </form>
+        <p class="notify-done" id="notify-done" tabindex="-1" hidden>You're on the list. When the system goes live, you'll be the first to know.</p>
+
+        <h3 class="share-heading">Share Your Glitch</h3>
+        <p>Got a glitch story? Tell us what happened.</p>
         <form id="share" class="glitch-form" action="https://formsubmit.co/areyouaglitchpodcast@gmail.com" method="POST">
             <input type="hidden" name="_subject" value="New glitch submission from AreYouAGlitch.com">
             <input type="hidden" name="_template" value="table">
@@ -137,12 +152,12 @@
         </div>
     </div>
 
-    <script src="sound.js?v=20261006b"></script>
+    <script src="sound.js?v=20261006c"></script>
     <button class="page-sound" id="page-sound" type="button" aria-pressed="false">SOUND: ON</button>
 
-    <script src="diagnostic.js?v=20261006b"></script>
-    <script src="page.js?v=20261006b"></script>
-    <script src="form.js?v=20261006b"></script>
+    <script src="diagnostic.js?v=20261006c"></script>
+    <script src="page.js?v=20261006c"></script>
+    <script src="form.js?v=20261006c"></script>
     <script>
         document.querySelectorAll('.card[data-topic]').forEach(function (card) {
             card.addEventListener('click', function () {

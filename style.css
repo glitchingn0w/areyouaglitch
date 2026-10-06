@@ -446,3 +446,71 @@ footer {
     content: '> ';
     color: #ff00ff;
 }
+
+/* Launch signup */
+.notify-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-width: 520px;
+    margin: 24px auto 0;
+}
+
+.notify-form[hidden] {
+    display: none;
+}
+
+.notify-form input[type="email"] {
+    flex: 1 1 240px;
+    padding: 12px;
+    background: #111;
+    color: #fff;
+    border: 1px solid #00ffea;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1em;
+}
+
+.notify-form input[type="email"]:focus {
+    outline: none;
+    border-color: #ff00ff;
+    box-shadow: 0 0 10px #ff00ff;
+}
+
+.notify-form .btn {
+    flex: 0 0 auto;
+    margin-top: 0;
+}
+
+.notify-form .btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.notify-done {
+    max-width: 520px;
+    margin: 24px auto 0;
+    padding: 16px;
+    border: 1px solid #ff00ff;
+    box-shadow: 0 0 10px #ff00ff;
+    color: #fff;
+    outline: none;
+}
+
+.notify-done[hidden] {
+    display: none;
+}
+
+.share-heading {
+    margin: 56px 0 0;
+    font-size: 1.4em;
+    color: #00ffea;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
