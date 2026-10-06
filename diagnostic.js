@@ -18,6 +18,17 @@
     var toForm = document.getElementById('to-form');
     var exitBtn = document.getElementById('exit');
     var closeBtn = document.getElementById('system-close');
+    var muteBtn = document.getElementById('system-mute');
+
+    var sound = window.GlitchSound;
+    function sfx(name) { if (sound && sound[name]) sound[name](); }
+
+    function updateMute() {
+        if (!muteBtn || !sound) return;
+        var off = sound.isMuted();
+        muteBtn.textContent = off ? 'SOUND OFF' : 'SOUND ON';
+        muteBtn.setAttribute('aria-pressed', off ? 'true' : 'false');
+    }
 
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -61,12 +72,15 @@
         result.hidden = true;
         system.hidden = false;
         document.body.style.overflow = 'hidden';
+        updateMute();
+        sfx('start');
         closeBtn.focus();
         runBoot();
     }
 
     function close(targetId) {
         clearTimers();
+        sfx('stop');
         system.hidden = true;
         document.body.style.overflow = '';
         var target = targetId && document.getElementById(targetId);
@@ -76,6 +90,8 @@
     function runBoot() {
         if (reduced) {
             bootLines.forEach(function (line) { addLine(line); });
+            sfx('bleep');
+            sfx('staticBurst');
             later(startQuiz, 800);
             return;
         }
@@ -95,8 +111,11 @@
         var line = bootLines[i];
         var p = addLine('');
         var c = 0;
+        sfx('bleep');
+        if (i === 2) sfx('staticBurst');
         (function step() {
             p.textContent = line.slice(0, ++c);
+            if (c % 2 === 0) sfx('tick');
             if (c < line.length) later(step, 18);
             else later(function () { typeLine(i + 1); }, 220);
         })();
@@ -119,6 +138,7 @@
     }
 
     function answer(points) {
+        sfx('answer');
         score += points;
         current++;
         if (current < questions.length) showQuestion();
@@ -136,6 +156,7 @@
         shareBtn.textContent = 'Share My Result';
         quiz.hidden = true;
         result.hidden = false;
+        sfx('reveal');
         shareBtn.focus();
     }
 
@@ -163,6 +184,12 @@
         var name = document.getElementById('name');
         if (name) setTimeout(function () { name.focus({ preventScroll: true }); }, reduced ? 0 : 600);
     });
+    if (muteBtn && sound) {
+        muteBtn.addEventListener('click', function () {
+            sound.setMuted(!sound.isMuted());
+            updateMute();
+        });
+    }
     exitBtn.addEventListener('click', function () { close('about'); });
     closeBtn.addEventListener('click', function () { close('about'); });
     document.addEventListener('keydown', function (e) {

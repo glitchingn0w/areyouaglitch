@@ -99,6 +99,7 @@
     </footer>
     <div id="system" class="system" role="dialog" aria-modal="true" aria-label="Glitch diagnostic" hidden>
         <div class="system-panel">
+            <button class="system-mute" id="system-mute" type="button" aria-pressed="false">SOUND ON</button>
             <button class="system-close" id="system-close" type="button" aria-label="Exit the system">&times;</button>
 
             <div class="boot" id="boot" aria-live="polite"></div>
@@ -128,6 +129,7 @@
         </div>
     </div>
 
+    <script src="sound.js"></script>
     <script src="diagnostic.js"></script>
     <script>
         document.querySelectorAll('.card[data-topic]').forEach(function (card) {
