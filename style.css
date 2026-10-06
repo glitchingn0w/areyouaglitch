@@ -143,6 +143,54 @@ section {
     color: #ff00ff;
 }
 
+.glitch-form {
+    display: flex;
+    flex-direction: column;
+    max-width: 520px;
+    margin: 30px auto 0;
+    text-align: left;
+    scroll-margin-top: 40px;
+}
+
+.glitch-form label {
+    margin: 16px 0 6px;
+    color: #ccc;
+    font-size: 0.95em;
+}
+
+.glitch-form input,
+.glitch-form select,
+.glitch-form textarea {
+    background: #111;
+    color: #fff;
+    border: 1px solid #00ffea;
+    padding: 12px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1em;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.glitch-form textarea {
+    resize: vertical;
+}
+
+.glitch-form input:focus,
+.glitch-form select:focus,
+.glitch-form textarea:focus {
+    outline: none;
+    border-color: #ff00ff;
+    box-shadow: 0 0 10px #ff00ff;
+}
+
+.glitch-form .btn {
+    align-self: center;
+    margin-top: 28px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1em;
+    cursor: pointer;
+}
+
 footer {
     padding: 20px;
     font-size: 0.9em;

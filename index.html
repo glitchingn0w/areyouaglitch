@@ -29,32 +29,32 @@
     <section id="themes">
         <h2>Sample Glitch Topics</h2>
         <div class="topics">
-            <a class="card" href="mailto:areyouaglitchpodcast@gmail.com?subject=My%20Digital%20Glitch">
+            <a class="card" href="#share" data-topic="The Digital Age &amp; Glitches">
                 <h3>The Digital Age &amp; Glitches</h3>
                 <p>Your phone knows where you are. Your feed knows what you want. And the system still crashes. What happens when the machines we trust start to slip?</p>
                 <span class="card-cta">Share your glitch &rarr;</span>
             </a>
-            <a class="card" href="mailto:areyouaglitchpodcast@gmail.com?subject=My%20Personal%20Glitch">
+            <a class="card" href="#share" data-topic="Personal Glitches">
                 <h3>Personal Glitches</h3>
                 <p>The d&eacute;j&agrave; vu that stops you cold. The day where nothing goes right. Those moments when you feel like the error in your own life.</p>
                 <span class="card-cta">Share your glitch &rarr;</span>
             </a>
-            <a class="card" href="mailto:areyouaglitchpodcast@gmail.com?subject=My%20Simulation%20Glitch">
+            <a class="card" href="#share" data-topic="Simulation Theory">
                 <h3>Simulation Theory</h3>
                 <p>What if none of this is the real layer? We dig into the idea that reality runs on code, and the strange clues people swear they've found.</p>
                 <span class="card-cta">Share your glitch &rarr;</span>
             </a>
-            <a class="card" href="mailto:areyouaglitchpodcast@gmail.com?subject=My%20Glitch%20Art">
+            <a class="card" href="#share" data-topic="Glitch Art">
                 <h3>Glitch Art</h3>
                 <p>Broken pixels. Corrupted files. Distorted sound. How artists turn mistakes into something beautiful, and why an error can be a masterpiece.</p>
                 <span class="card-cta">Share your glitch &rarr;</span>
             </a>
-            <a class="card" href="mailto:areyouaglitchpodcast@gmail.com?subject=My%20Mind%20vs%20Machine%20Glitch">
+            <a class="card" href="#share" data-topic="Mind vs Machine">
                 <h3>Mind vs Machine</h3>
                 <p>AI is learning to think, write and create. Where does the human mind end and the machine begin, and who is really in control?</p>
                 <span class="card-cta">Share your glitch &rarr;</span>
             </a>
-            <a class="card" href="mailto:areyouaglitchpodcast@gmail.com?subject=My%20Societal%20Glitch">
+            <a class="card" href="#share" data-topic="Societal Glitches">
                 <h3>Societal Glitches</h3>
                 <p>Traffic that never moves. Systems built to fail. Rules nobody follows. The breakdowns we all live with and somehow stopped noticing.</p>
                 <span class="card-cta">Share your glitch &rarr;</span>
@@ -65,11 +65,44 @@
     <section id="connect">
         <h2>Stay Connected</h2>
         <p>Podcast launching soon. Follow us or share your glitch:</p>
-        <a href="mailto:areyouaglitchpodcast@gmail.com" class="btn">Submit Your Glitch</a>
+        <form id="share" class="glitch-form" action="https://formsubmit.co/areyouaglitchpodcast@gmail.com" method="POST">
+            <input type="hidden" name="_subject" value="New glitch submission from AreYouAGlitch.com">
+            <input type="hidden" name="_template" value="table">
+            <input type="hidden" name="_next" value="https://areyouaglitch.com/thanks.html">
+
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Your name or alias">
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="So we can reach you" required>
+
+            <label for="topic">Topic</label>
+            <select id="topic" name="topic">
+                <option>The Digital Age &amp; Glitches</option>
+                <option>Personal Glitches</option>
+                <option>Simulation Theory</option>
+                <option>Glitch Art</option>
+                <option>Mind vs Machine</option>
+                <option>Societal Glitches</option>
+                <option>Something else</option>
+            </select>
+
+            <label for="story">Your glitch</label>
+            <textarea id="story" name="story" rows="6" placeholder="Tell us what happened..." required></textarea>
+
+            <button type="submit" class="btn">Submit Your Glitch</button>
+        </form>
     </section>
 
     <footer>
         <p>&copy; 2026 AreYouAGlitch.com</p>
     </footer>
+    <script>
+        document.querySelectorAll('.card[data-topic]').forEach(function (card) {
+            card.addEventListener('click', function () {
+                document.getElementById('topic').value = card.dataset.topic;
+            });
+        });
+    </script>
 </body>
 </html>
